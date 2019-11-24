@@ -88,9 +88,14 @@ def is_accepted_type_for_node(osm_result, feature_type):
 
 
 def is_accepted_type_for_relation(osm_result, feature_type):
-    return osm_result["osm_type"] == "relation" and \
-           osm_result["type"] == "park" and \
-           feature_type == "park"
+    return osm_result["osm_type"] == "relation" and\
+           (
+               osm_result["type"] == "park" and
+               feature_type == "park"
+           ) or (
+               osm_result["type"] == "wood" and
+               feature_type == "skog"
+           )
 
 
 def has_correct_name(osm_result, feature_name):
@@ -179,7 +184,8 @@ def update_when_present_in_map(feature_type, osm_response_list, wp_data, feature
     wikipedia.print_json_to_file(updated_wikipedia_content, wp_data)
 
     if osm.is_hardcoded(feature_name):
-        errors_superfluous_hardcoded_coordinate += [feature_name]
+        coloured_name_and_type = colored(feature_name, "red") + " (" + colored(feature_type, "yellow") + ")"
+        errors_superfluous_hardcoded_coordinate += [coloured_name_and_type]
     return errors_superfluous_hardcoded_coordinate
 
 
@@ -198,13 +204,15 @@ def gather_statistics(feature_type, has_coordinates, lacks_coordinates, wp_data,
 def print_statistics(has_coordinates, lacks_coordinates, errors_superflous_hardcoded_coordinate, type_counter):
     sorted_types = sorted(type_counter.items(), key=operator.itemgetter(1))
     print("\n")
-    print("Total amount of features not present on OSM: " + str(has_coordinates + lacks_coordinates))
-    print("Amount of the total that has  coordinates: " + str(has_coordinates))
-    print("Amount of the total that lack coordinates: " + str(lacks_coordinates))
+    print("Total amount of features not present on OSM: " + colored(str(has_coordinates + lacks_coordinates), "red"))
+    print("Amount of the total that has  coordinates: " + colored(str(has_coordinates), "red"))
+    print("Amount of the total that lack coordinates: " + colored(str(lacks_coordinates), "red"))
 
     print("\nThese are the types:")
     for tup in sorted_types:
-        print("%3d: %s" % (tup[1], tup[0]))
+        num = colored("{:>3}".format(str(tup[1])), "red")
+        feature_type = colored(tup[0], "yellow")
+        print(num + ": " + feature_type)
 
     if len(errors_not_way) > 0:
         print("\n\nThese results from OSM have the name asked for, but not the right type:")
@@ -215,14 +223,21 @@ def print_statistics(has_coordinates, lacks_coordinates, errors_superflous_hardc
         for error in errors_wrong_name:
             print(error)
     if len(errors_is_blacklisted) > 0:
-        print("\n\nThese results from OSM have the name asked for, but are blacklisted since they are not "
-              "the results that we look for:")
+        print("\n\nThese results from OSM have the name asked for, but are blacklisted:")
         for error in errors_is_blacklisted:
             print(error)
     if len(errors_superflous_hardcoded_coordinate) > 0:
         print("\n\nThese coordinates have been hardcoded in, but they are already present in OSM:")
         for error in errors_superflous_hardcoded_coordinate:
             print(error)
+
+    print("\n")
+    print("The features not present in OSM have been written to " + colored(missing_features_file, "blue"))
+    print("The original Wikipedia page has been formatted, and features without coordinates on the Wikipedia page "
+          "have had their coordinates looked up from OSM. The result has been written to " +
+          colored(updated_wikipedia_content, "blue"))
+    print("Finally, although not intended for human consumption, all responses from the OSM server has been "
+          "cached here: " + colored(osm.osm_responses_file, "blue"))
 
 
 def write_header_to_file(file_name):

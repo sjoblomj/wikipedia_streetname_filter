@@ -22,8 +22,8 @@ def file_is_older_than_one_day(file_name):
     return (calendar.timegm(time.gmtime()) - int(os.path.getmtime(file_name))) > one_day
 
 
-def open_json_file(filename):
-    with open(filename) as json_file:
+def open_json_file(file_name):
+    with open(file_name) as json_file:
         return json.load(json_file)
 
 
