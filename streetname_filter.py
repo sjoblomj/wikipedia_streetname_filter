@@ -83,19 +83,36 @@ def is_accepted_type_for_way(osm_result, feature_type):
 
 def is_accepted_type_for_node(osm_result, feature_type):
     return osm_result["osm_type"] == "node" and \
-           osm_result["type"] == "motorway_junction" and \
-           feature_type == "mot"
+        (
+            osm_result["type"] == "motorway_junction" and
+            feature_type == "mot"
+        ) or (
+            osm_result["type"] == "neighbourhood" and
+            feature_type == "plats"
+        ) or (
+            osm_result["type"] == "hamlet" and
+            feature_type == "område"
+        )
 
 
 def is_accepted_type_for_relation(osm_result, feature_type):
-    return osm_result["osm_type"] == "relation" and\
-           (
-               osm_result["type"] == "park" and
-               feature_type == "park"
-           ) or (
-               osm_result["type"] == "wood" and
-               feature_type == "skog"
-           )
+    return osm_result["osm_type"] == "relation" and \
+        (
+            osm_result["type"] == "park" and
+            feature_type == "park"
+        ) or (
+            osm_result["type"] == "forest" and
+            feature_type == "park"
+        ) or (
+            osm_result["type"] == "scrub" and
+            feature_type == "park"
+        ) or (
+            osm_result["type"] == "wood" and
+            feature_type == "skog"
+        ) or (
+            osm_result["type"] == "pedestrian" and
+            feature_type == "plats"
+        )
 
 
 def has_correct_name(osm_result, feature_name):
@@ -143,18 +160,18 @@ def get_missing_features(wp_data_list):
         feature_type = wikipedia.remove_links(wp_data["typ"])
         osm_response = osm.get_osm_response(feature_name)
 
-        if is_present_in_map(osm_response, feature_name, feature_type):
-
-            errors_superfluous_hardcoded_coordinate = \
-                update_when_present_in_map(feature_type, osm_response, wp_data, feature_name,
-                                           errors_superfluous_hardcoded_coordinate)
-
-        elif feature_name.startswith("S:t ") and \
+        if feature_name.startswith("S:t ") and \
                 is_present_in_map(osm.get_osm_response(feature_name.replace("S:t ", "Sankt ", 1)),
                                   feature_name.replace("S:t ", "Sankt ", 1), feature_type):
 
             feature_name = feature_name.replace("S:t ", "Sankt ", 1)
             osm_response = osm.get_osm_response(feature_name)
+
+            errors_superfluous_hardcoded_coordinate = \
+                update_when_present_in_map(feature_type, osm_response, wp_data, feature_name,
+                                           errors_superfluous_hardcoded_coordinate)
+
+        elif is_present_in_map(osm_response, feature_name, feature_type):
 
             errors_superfluous_hardcoded_coordinate = \
                 update_when_present_in_map(feature_type, osm_response, wp_data, feature_name,

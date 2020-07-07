@@ -18,8 +18,6 @@ coordinates = {
     u"Redareparken": u"{{coord|57|42|13.8|N|11|57|16.4|E|name=Redareparken (park) - Källa: Gissning}}",
     u"Skeppsbropiren": u"{{coord|57|42|11.3|N|11|57|11.7|E|name=Skeppsbropiren (pir) - Källa: Gissning}}",
     u"Skallgången": u"{{Coord|57|36|50.50|N|11|56|40.58|E|name=Skallgången (gångstig) - Källa: Gissning}}",
-    u"Bergslagsmotet": u"{{coord|57|42|43.0|N|11|58|19.0|E|name=Bergslagsmotet (mot) - Källa: Gissning}}",
-    u"Falutorgsmotet": u"{{coord|57|43|0.2|N|11|58|56.0|E|name=Falutorgsmotet (mot) - Källa: Gissning}}",
     u"Forthamnsvägen": u"{{Coord|57|40|35.4|N|11|51|14.0|E|name=Forthamnsvägen (väg) - Källa: Gissning}}",
     u"Radarhöjden": u"{{Coord|57|40|37.7|N|11|51|31.8|E|name=Radarhöjden (plats) - Källa: Gissning}}",
     u"Kolhyvarestigen": u"{{Coord|57|40|29.19|N|11|51|52.14|E|name=Kolhyvarestigen (stig) - Källa: Gissning}}",
@@ -47,8 +45,8 @@ def get_osm_response(feature_name):
         json_response = download_response(feature_name)
 
     else:
-        with io.open(osm_responses_file, "r", encoding="utf-8") as my_file:
-            file_content = my_file.read()
+        with io.open(osm_responses_file, "r", encoding="utf-8") as responses_file:
+            file_content = responses_file.read()
             json_content = ioutils.read_json_string(file_content)
 
             if feature_name in json_content:
