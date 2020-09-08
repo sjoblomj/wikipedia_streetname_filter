@@ -89,6 +89,9 @@ def is_accepted_type_for_node(osm_result, feature_type):
         ) or (
             osm_result["type"] == "neighbourhood" and
             feature_type == "plats"
+         ) or (
+            osm_result["type"] == "isolated_dwelling" and
+            feature_type == "plats"
         ) or (
             osm_result["type"] == "hamlet" and
             feature_type == "område"
@@ -111,6 +114,15 @@ def is_accepted_type_for_relation(osm_result, feature_type):
             feature_type == "skog"
         ) or (
             osm_result["type"] == "pedestrian" and
+            feature_type == "plats"
+        ) or (
+            osm_result["type"] == "square" and
+            feature_type == "plats"
+        ) or (
+            osm_result["type"] == "grass" and
+            feature_type == "plats"
+        ) or (
+            osm_result["type"] == "recreation_ground" and
             feature_type == "plats"
         )
 
@@ -148,7 +160,7 @@ def get_missing_features(wp_data_list):
     for wp_data in wp_data_list:
         feature_name = wikipedia.remove_links(wp_data['gatunamn'])
 
-        sys.stdout.write("On feature %-40s %d of %d (%d%%)\r" % (colored(feature_name, "red"), i, len(wp_data_list),
+        sys.stdout.write(" On feature %-40s %d of %d (%d%%)\r" % (colored(feature_name, "red"), i, len(wp_data_list),
                                                                  i * 100 / len(wp_data_list)))
         sys.stdout.flush()
         i += 1
