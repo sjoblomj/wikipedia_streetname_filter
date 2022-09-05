@@ -68,6 +68,10 @@ def is_feature_decommissioned(wp_data):
     return u"avregistrerat" in wp_data[u"fastställd"]
 
 
+def is_accepted_type(osm_result, feature_type, accepted_result_type, accepted_feature_type):
+    return osm_result["type"] == accepted_result_type and feature_type == accepted_feature_type
+
+
 def is_of_accepted_type(osm_result, feature_type):
     return is_accepted_type_for_way(osm_result, feature_type) or \
            is_accepted_type_for_node(osm_result, feature_type) or \
@@ -82,49 +86,41 @@ def is_accepted_type_for_way(osm_result, feature_type):
 
 
 def is_accepted_type_for_node(osm_result, feature_type):
-    return osm_result["osm_type"] == "node" and \
-        (
-            osm_result["type"] == "motorway_junction" and
-            feature_type == "mot"
-        ) or (
-            osm_result["type"] == "neighbourhood" and
-            feature_type == "plats"
-         ) or (
-            osm_result["type"] == "isolated_dwelling" and
-            feature_type == "plats"
-        ) or (
-            osm_result["type"] == "hamlet" and
-            feature_type == "område"
-        )
+    accepted_types = [                         \
+        ("motorway_junction", "mot"),          \
+        ("neighbourhood", "plats"),            \
+        ("isolated_dwelling", "plats"),        \
+        ("locality", "plats"),                 \
+        ("locality", "park"),                  \
+        ("locality", "backe"),                 \
+        ("hamlet", "område"),                  \
+    ]
+
+    has_accepted_type = any(list(map(lambda x: is_accepted_type(osm_result, feature_type, x[0], x[1]), accepted_types)))
+    return osm_result["osm_type"] == "node" and has_accepted_type
 
 
 def is_accepted_type_for_relation(osm_result, feature_type):
-    return osm_result["osm_type"] == "relation" and \
-        (
-            osm_result["type"] == "park" and
-            feature_type == "park"
-        ) or (
-            osm_result["type"] == "forest" and
-            feature_type == "park"
-        ) or (
-            osm_result["type"] == "scrub" and
-            feature_type == "park"
-        ) or (
-            osm_result["type"] == "wood" and
-            feature_type == "skog"
-        ) or (
-            osm_result["type"] == "pedestrian" and
-            feature_type == "plats"
-        ) or (
-            osm_result["type"] == "square" and
-            feature_type == "plats"
-        ) or (
-            osm_result["type"] == "grass" and
-            feature_type == "plats"
-        ) or (
-            osm_result["type"] == "recreation_ground" and
-            feature_type == "plats"
-        )
+    accepted_types = [                         \
+        ("park", "park"),                      \
+        ("track", "idrottsplan"),              \
+        ("sports_centre", "idrottsplan"),      \
+        ("sports_centre", "idrottsanläggning"),\
+        ("meadow", "område"),                  \
+        ("forest", "park"),                    \
+        ("forest", "dalgång"),                 \
+        ("scrub", "park"),                     \
+        ("wood", "skog"),                      \
+        ("square", "torg"),                    \
+        ("square", "plats"),                   \
+        ("square", "väg"),                     \
+        ("pedestrian", "plats"),               \
+        ("grass", "plats"),                    \
+        ("recreation_ground", "plats"),        \
+    ]
+
+    has_accepted_type = any(list(map(lambda x: is_accepted_type(osm_result, feature_type, x[0], x[1]), accepted_types)))
+    return osm_result["osm_type"] == "relation" and has_accepted_type
 
 
 def has_correct_name(osm_result, feature_name):
@@ -193,7 +189,11 @@ def get_missing_features(wp_data_list):
             wikipedia.print_json_to_file(updated_wikipedia_content, wp_data)
 
             if wp_data['koordinater'] != "":
-                wp_data['koordinater'] = wp_data['koordinater'].replace("}}", u" - Källa: WP}}")
+                if "|name=" in wp_data['koordinater']:
+                    wp_data['koordinater'] = wp_data['koordinater'].replace("}}", u" - Källa: WP}}")
+                else:
+                    wp_data['koordinater'] = wp_data['koordinater'] \
+                        .replace("}}", u"|name=" + feature_name + " (" + wp_data['typ'] + ") - Källa: WP}}")
             elif osm.is_hardcoded(feature_name):
                 wp_data['koordinater'] = osm.get_hardcoded_value(feature_name)
 
