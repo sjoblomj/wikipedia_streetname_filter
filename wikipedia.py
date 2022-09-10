@@ -5,7 +5,8 @@ import re
 import requests
 
 
-wikipedia_url = "http://sv.wikipedia.org/w/index.php?action=raw&title=Gatunamn_i_G%C3%B6teborg_fr%C3%A5n_och_med_2001"
+wikipedia_url_2001_to_2016 = "http://sv.wikipedia.org/w/index.php?action=raw&title=Gatunamn_i_G%C3%B6teborg_fr%C3%A5n_och_med_2001"
+wikipedia_url_2017_to_now  = "http://sv.wikipedia.org/w/index.php?action=raw&title=Gatunamn_i_G%C3%B6teborg_fr%C3%A5n_och_med_2001/2017"
 valid_keys = [u"gatunamn", u"stadsdel", u"motivering", u"typ", u"fastställd", u"koordinater", u"bild",
               u"fotnot-namn", u"fotnot"]
 
@@ -18,8 +19,11 @@ def remove_links(name):
         return name.replace("]]", "")
 
 
-def download_page():
-    return requests.get(wikipedia_url).text
+def download_page_2001_to_2016():
+    return requests.get(wikipedia_url_2001_to_2016).text
+
+def download_page_2017_to_now():
+    return requests.get(wikipedia_url_2017_to_now) .text
 
 
 def get_header(page):

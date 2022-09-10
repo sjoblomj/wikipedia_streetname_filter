@@ -23,8 +23,9 @@ blacklisted_osm_ids = {
 cached_osm_responses = {}
 osm_responses_file = "osm_responses.txt"
 
-nominatim_url = "http://nominatim.openstreetmap.org/search?" \
-                "format=json&bounded=1&viewbox=11.6000,57.5000,12.3000,57.9000&q="
+#nominatim_url = "http://nominatim.openstreetmap.org/search?" \
+#                "format=json&bounded=1&viewbox=11.6000,57.5000,12.3000,57.9000&q="
+nominatim_url = "http://localhost:7171/search?q="
 
 
 def get_osm_response(feature_name):

@@ -281,15 +281,19 @@ def write_header_to_file(file_name):
             u"[https://github.com/sjoblomj/wikipedia_streetname_filter ett skript]\n\n----\n\n")
 
 
-wikipedia_page = wikipedia.download_page()
+wikipedia_page_2001_to_2016 = wikipedia.download_page_2001_to_2016()
+wikipedia_page_2017_to_now  = wikipedia.download_page_2017_to_now()
 write_header_to_file(missing_features_file)
 
-ioutils.write_to_file(missing_features_file, wikipedia.get_header(wikipedia_page))
-ioutils.write_to_file(updated_wikipedia_content, wikipedia.get_header(wikipedia_page), "w")
+ioutils.write_to_file(missing_features_file, wikipedia.get_header(wikipedia_page_2001_to_2016))
+ioutils.write_to_file(updated_wikipedia_content, wikipedia.get_header(wikipedia_page_2001_to_2016), "w")
 
-get_missing_features(ioutils.read_json_string(wikipedia.content_to_json(wikipedia.get_content(wikipedia_page))))
+json_wp_data = ioutils.read_json_string(wikipedia.content_to_json(wikipedia.get_content(wikipedia_page_2001_to_2016))) +\
+               ioutils.read_json_string(wikipedia.content_to_json(wikipedia.get_content(wikipedia_page_2017_to_now)))
 
-ioutils.write_to_file(missing_features_file, wikipedia.remove_categories(wikipedia.get_footer(wikipedia_page)))
-ioutils.write_to_file(updated_wikipedia_content, wikipedia.get_footer(wikipedia_page))
+get_missing_features(json_wp_data)
+
+ioutils.write_to_file(missing_features_file, wikipedia.remove_categories(wikipedia.get_footer(wikipedia_page_2001_to_2016)))
+ioutils.write_to_file(updated_wikipedia_content, wikipedia.get_footer(wikipedia_page_2001_to_2016))
 
 ioutils.write_to_file(osm.osm_responses_file, json.dumps(osm.cached_osm_responses), "w")
