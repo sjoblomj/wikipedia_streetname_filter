@@ -156,7 +156,7 @@ def get_missing_features(wp_data_list):
     for wp_data in wp_data_list:
         feature_name = wikipedia.remove_links(wp_data['gatunamn'])
 
-        sys.stdout.write(" On feature %-40s %d of %d (%d%%)\r" % (colored(feature_name, "red"), i, len(wp_data_list),
+        sys.stdout.write(" On feature %-50s %d of %d (%d%%)\r" % (colored(feature_name, "red"), i, len(wp_data_list),
                                                                  i * 100 / len(wp_data_list)))
         sys.stdout.flush()
         i += 1
